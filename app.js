@@ -3,6 +3,13 @@ import morgan from "morgan";
 import cors from "cors";
 
 import contactsRouter from "./routes/contactsRouter.js";
+import { connectDB } from "./db/sequelize.js";
+import Contact from "./models/contactModel.js";
+import { seedContactsIfNeeded } from "./helpers/seedContacts.js";
+
+await connectDB();
+await Contact.sync();
+await seedContactsIfNeeded();
 
 const app = express();
 
