@@ -10,8 +10,12 @@ import User from "./models/userModel.js";
 import { seedContactsIfNeeded } from "./helpers/seedContacts.js";
 
 await connectDB();
-await Contact.sync();
+
+User.hasMany(Contact, { foreignKey: "owner", as: "contacts" });
+Contact.belongsTo(User, { foreignKey: "owner", as: "user" });
+
 await User.sync();
+await Contact.sync();
 await seedContactsIfNeeded();
 
 const app = express();
