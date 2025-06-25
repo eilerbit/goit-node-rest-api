@@ -2,6 +2,7 @@ import express from "express";
 import morgan from "morgan";
 import cors from "cors";
 
+import { sequelize } from "./db/sequelize.js";
 import contactsRouter from "./routes/contactsRouter.js";
 import authRouter from "./routes/authRouter.js";
 import { connectDB } from "./db/sequelize.js";
@@ -14,8 +15,7 @@ await connectDB();
 User.hasMany(Contact, { foreignKey: "owner", as: "contacts" });
 Contact.belongsTo(User, { foreignKey: "owner", as: "user" });
 
-await User.sync();
-await Contact.sync();
+await sequelize.sync({ alter: true });
 await seedContactsIfNeeded();
 
 const app = express();
