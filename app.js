@@ -8,6 +8,7 @@ import authRouter from "./routes/authRouter.js";
 import { connectDB } from "./db/sequelize.js";
 import Contact from "./models/contactModel.js";
 import User from "./models/userModel.js";
+import auth from "./middlewares/auth.js";
 import { seedContactsIfNeeded } from "./helpers/seedContacts.js";
 
 await connectDB();
@@ -24,7 +25,7 @@ app.use(morgan("tiny"));
 app.use(cors());
 app.use(express.json());
 
-app.use("/api/contacts", contactsRouter);
+app.use("/api/contacts", auth, contactsRouter);
 app.use("/api/auth", authRouter);
 
 app.use((_, res) => {

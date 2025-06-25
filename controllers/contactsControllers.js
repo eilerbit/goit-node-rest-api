@@ -3,9 +3,22 @@ import HttpError from "../helpers/HttpError.js";
 
 export const getAllContacts = async (req, res, next) => {
     try {
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 20;
+        const offset = (page - 1) * limit;
+
+        const where = { owner: req.user.id };
+
+        if (req.query.favorite !== undefined) {
+            where.favorite = req.query.favorite === "true";
+        }
+
         const contacts = await contactsService.listContacts({
-            where: { owner: req.user.id },
+            where,
+            limit,
+            offset,
         });
+
         res.status(200).json(contacts);
     } catch (error) {
         next(error);
