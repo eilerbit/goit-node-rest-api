@@ -1,15 +1,21 @@
 import express from "express";
 import morgan from "morgan";
 import cors from "cors";
+import fs from "fs";
+import path from "path";
 
-import { sequelize } from "./db/sequelize.js";
+import { sequelize, connectDB } from "./db/sequelize.js";
 import contactsRouter from "./routes/contactsRouter.js";
 import authRouter from "./routes/authRouter.js";
-import { connectDB } from "./db/sequelize.js";
 import Contact from "./models/contactModel.js";
 import User from "./models/userModel.js";
 import auth from "./middlewares/auth.js";
 import { seedContactsIfNeeded } from "./helpers/seedContacts.js";
+
+const tempDir = path.resolve("temp")
+if (!fs.existsSync(tempDir)) {
+  fs.mkdirSync(tempDir, { recursive: true });
+}
 
 await connectDB();
 
@@ -21,6 +27,7 @@ await seedContactsIfNeeded();
 
 const app = express();
 
+app.use(express.static("public"));
 app.use(morgan("tiny"));
 app.use(cors());
 app.use(express.json());
