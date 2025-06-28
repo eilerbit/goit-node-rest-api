@@ -1,32 +1,32 @@
 import Contact from "../models/contactModel.js";
 
-async function listContacts() {
-    return await Contact.findAll();
+async function listContacts(filter = {}) {
+    return await Contact.findAll(filter);
 }
 
-async function getContactById(contactId) {
-    return await Contact.findByPk(contactId);
+async function getContactById(contactId, ownerId) {
+    return await Contact.findOne({ where: { id: contactId, owner: ownerId } });
 }
 
-async function addContact(name, email, phone) {
-    return await Contact.create({ name, email, phone });
+async function addContact(name, email, phone, favorite, owner) {
+    return await Contact.create({ name, email, phone, favorite, owner });
 }
 
-async function removeContact(contactId) {
-    const contact = await getContactById(contactId);
+async function removeContact(contactId, ownerId) {
+    const contact = await getContactById(contactId, ownerId);
     if (!contact) return null;
     await contact.destroy();
     return contact;
 }
 
-async function updateContact(id, data) {
-    const contact = await getContactById(id);
+async function updateContact(id, data, ownerId) {
+    const contact = await getContactById(id, ownerId);
     if (!contact) return null;
     return await contact.update(data);
 }
 
-async function updateStatusContact(id, { favorite }) {
-    const contact = await getContactById(id);
+async function updateStatusContact(id, { favorite }, ownerId) {
+    const contact = await getContactById(id, ownerId);
     if (!contact) return null;
     return await contact.update({ favorite });
 }

@@ -2,13 +2,21 @@ import express from "express";
 import morgan from "morgan";
 import cors from "cors";
 
+import { sequelize } from "./db/sequelize.js";
 import contactsRouter from "./routes/contactsRouter.js";
+import authRouter from "./routes/authRouter.js";
 import { connectDB } from "./db/sequelize.js";
 import Contact from "./models/contactModel.js";
+import User from "./models/userModel.js";
+import auth from "./middlewares/auth.js";
 import { seedContactsIfNeeded } from "./helpers/seedContacts.js";
 
 await connectDB();
-await Contact.sync();
+
+User.hasMany(Contact, { foreignKey: "owner", as: "contacts" });
+Contact.belongsTo(User, { foreignKey: "owner", as: "user" });
+
+await sequelize.sync({ alter: true });
 await seedContactsIfNeeded();
 
 const app = express();
@@ -17,7 +25,8 @@ app.use(morgan("tiny"));
 app.use(cors());
 app.use(express.json());
 
-app.use("/api/contacts", contactsRouter);
+app.use("/api/contacts", auth, contactsRouter);
+app.use("/api/auth", authRouter);
 
 app.use((_, res) => {
   res.status(404).json({ message: "Route not found" });
